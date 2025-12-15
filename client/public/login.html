@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Truco PY — Login</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Truco PY</div>
+      <div class="badge">MVP</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="panel stack">
+      <h1 class="h1">Entrar</h1>
+      <p class="p">Ingresá con Google. Después elegís tu apodo.</p>
+
+      <div id="error" class="small" style="color: var(--danger);"></div>
+
+      <button id="btnLogin" class="primary">Continuar con Google</button>
+      <a class="small" href="/index.html">Ir al inicio</a>
+
+      <hr />
+      <div class="small">Si ves pantalla en blanco: completá <span class="mono">/firebase-config.js</span>.</div>
+    </div>
+  </div>
+
+  <script src="/firebase-config.js"></script>
+  <script type="module" src="/src/pages/login.js"></script>
+</body>
+</html>

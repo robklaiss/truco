@@ -1,0 +1,322 @@
+[
+    {
+        "cardId": "bastos_01",
+        "suit": "bastos",
+        "rank": 1,
+        "trucoPower": 11,
+        "envidoValue": 1,
+        "sourceId": "1_club"
+    },
+    {
+        "cardId": "bastos_02",
+        "suit": "bastos",
+        "rank": 2,
+        "trucoPower": 7,
+        "envidoValue": 2,
+        "sourceId": "2_club"
+    },
+    {
+        "cardId": "bastos_03",
+        "suit": "bastos",
+        "rank": 3,
+        "trucoPower": 8,
+        "envidoValue": 3,
+        "sourceId": "3_club"
+    },
+    {
+        "cardId": "bastos_04",
+        "suit": "bastos",
+        "rank": 4,
+        "trucoPower": 1,
+        "envidoValue": 4,
+        "sourceId": "4_club"
+    },
+    {
+        "cardId": "bastos_05",
+        "suit": "bastos",
+        "rank": 5,
+        "trucoPower": 2,
+        "envidoValue": 5,
+        "sourceId": "5_club"
+    },
+    {
+        "cardId": "bastos_06",
+        "suit": "bastos",
+        "rank": 6,
+        "trucoPower": 3,
+        "envidoValue": 6,
+        "sourceId": "6_club"
+    },
+    {
+        "cardId": "bastos_07",
+        "suit": "bastos",
+        "rank": 7,
+        "trucoPower": 4,
+        "envidoValue": 7,
+        "sourceId": "7_club"
+    },
+    {
+        "cardId": "bastos_10",
+        "suit": "bastos",
+        "rank": 10,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "jack_club"
+    },
+    {
+        "cardId": "bastos_11",
+        "suit": "bastos",
+        "rank": 11,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "queen_club"
+    },
+    {
+        "cardId": "bastos_12",
+        "suit": "bastos",
+        "rank": 12,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "king_club"
+    },
+    {
+        "cardId": "copas_01",
+        "suit": "copas",
+        "rank": 1,
+        "trucoPower": 6,
+        "envidoValue": 1,
+        "sourceId": "1_heart"
+    },
+    {
+        "cardId": "copas_02",
+        "suit": "copas",
+        "rank": 2,
+        "trucoPower": 7,
+        "envidoValue": 2,
+        "sourceId": "2_heart"
+    },
+    {
+        "cardId": "copas_03",
+        "suit": "copas",
+        "rank": 3,
+        "trucoPower": 8,
+        "envidoValue": 3,
+        "sourceId": "3_heart"
+    },
+    {
+        "cardId": "copas_04",
+        "suit": "copas",
+        "rank": 4,
+        "trucoPower": 1,
+        "envidoValue": 4,
+        "sourceId": "4_heart"
+    },
+    {
+        "cardId": "copas_05",
+        "suit": "copas",
+        "rank": 5,
+        "trucoPower": 2,
+        "envidoValue": 5,
+        "sourceId": "5_heart"
+    },
+    {
+        "cardId": "copas_06",
+        "suit": "copas",
+        "rank": 6,
+        "trucoPower": 3,
+        "envidoValue": 6,
+        "sourceId": "6_heart"
+    },
+    {
+        "cardId": "copas_07",
+        "suit": "copas",
+        "rank": 7,
+        "trucoPower": 4,
+        "envidoValue": 7,
+        "sourceId": "7_heart"
+    },
+    {
+        "cardId": "copas_10",
+        "suit": "copas",
+        "rank": 10,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "jack_heart"
+    },
+    {
+        "cardId": "copas_11",
+        "suit": "copas",
+        "rank": 11,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "queen_heart"
+    },
+    {
+        "cardId": "copas_12",
+        "suit": "copas",
+        "rank": 12,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "king_heart"
+    },
+    {
+        "cardId": "espadas_01",
+        "suit": "espadas",
+        "rank": 1,
+        "trucoPower": 12,
+        "envidoValue": 1,
+        "sourceId": "1_spade"
+    },
+    {
+        "cardId": "espadas_02",
+        "suit": "espadas",
+        "rank": 2,
+        "trucoPower": 7,
+        "envidoValue": 2,
+        "sourceId": "2_spade"
+    },
+    {
+        "cardId": "espadas_03",
+        "suit": "espadas",
+        "rank": 3,
+        "trucoPower": 8,
+        "envidoValue": 3,
+        "sourceId": "3_spade"
+    },
+    {
+        "cardId": "espadas_04",
+        "suit": "espadas",
+        "rank": 4,
+        "trucoPower": 1,
+        "envidoValue": 4,
+        "sourceId": "4_spade"
+    },
+    {
+        "cardId": "espadas_05",
+        "suit": "espadas",
+        "rank": 5,
+        "trucoPower": 2,
+        "envidoValue": 5,
+        "sourceId": "5_spade"
+    },
+    {
+        "cardId": "espadas_06",
+        "suit": "espadas",
+        "rank": 6,
+        "trucoPower": 3,
+        "envidoValue": 6,
+        "sourceId": "6_spade"
+    },
+    {
+        "cardId": "espadas_07",
+        "suit": "espadas",
+        "rank": 7,
+        "trucoPower": 10,
+        "envidoValue": 7,
+        "sourceId": "7_spade"
+    },
+    {
+        "cardId": "espadas_10",
+        "suit": "espadas",
+        "rank": 10,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "jack_spade"
+    },
+    {
+        "cardId": "espadas_11",
+        "suit": "espadas",
+        "rank": 11,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "queen_spade"
+    },
+    {
+        "cardId": "espadas_12",
+        "suit": "espadas",
+        "rank": 12,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "king_spade"
+    },
+    {
+        "cardId": "oros_01",
+        "suit": "oros",
+        "rank": 1,
+        "trucoPower": 6,
+        "envidoValue": 1,
+        "sourceId": "1_diamond"
+    },
+    {
+        "cardId": "oros_02",
+        "suit": "oros",
+        "rank": 2,
+        "trucoPower": 7,
+        "envidoValue": 2,
+        "sourceId": "2_diamond"
+    },
+    {
+        "cardId": "oros_03",
+        "suit": "oros",
+        "rank": 3,
+        "trucoPower": 8,
+        "envidoValue": 3,
+        "sourceId": "3_diamond"
+    },
+    {
+        "cardId": "oros_04",
+        "suit": "oros",
+        "rank": 4,
+        "trucoPower": 1,
+        "envidoValue": 4,
+        "sourceId": "4_diamond"
+    },
+    {
+        "cardId": "oros_05",
+        "suit": "oros",
+        "rank": 5,
+        "trucoPower": 2,
+        "envidoValue": 5,
+        "sourceId": "5_diamond"
+    },
+    {
+        "cardId": "oros_06",
+        "suit": "oros",
+        "rank": 6,
+        "trucoPower": 3,
+        "envidoValue": 6,
+        "sourceId": "6_diamond"
+    },
+    {
+        "cardId": "oros_07",
+        "suit": "oros",
+        "rank": 7,
+        "trucoPower": 9,
+        "envidoValue": 7,
+        "sourceId": "7_diamond"
+    },
+    {
+        "cardId": "oros_10",
+        "suit": "oros",
+        "rank": 10,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "jack_diamond"
+    },
+    {
+        "cardId": "oros_11",
+        "suit": "oros",
+        "rank": 11,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "queen_diamond"
+    },
+    {
+        "cardId": "oros_12",
+        "suit": "oros",
+        "rank": 12,
+        "trucoPower": 5,
+        "envidoValue": 0,
+        "sourceId": "king_diamond"
+    }
+]

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Truco PY — Perfil</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/index.html">Truco PY</a>
+      <div class="user-chip">
+        <img id="userPhoto" alt="" />
+        <div>
+          <div id="userName"></div>
+          <a class="small" href="#" id="btnLogout">Salir</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="panel stack">
+      <h1 class="h1">Tu perfil</h1>
+      <p class="p">Elegí un apodo. Va a aparecer en la mesa y en el ranking.</p>
+
+      <div class="kv">
+        <div>UID</div><div id="uid" class="mono"></div>
+      </div>
+
+      <hr />
+
+      <label class="small" for="nickname">Apodo</label>
+      <input id="nickname" maxlength="20" placeholder="Ej: as_de_espada" />
+      <div class="row">
+        <button id="btnSave" class="primary">Guardar</button>
+        <a href="/index.html"><button type="button">Volver</button></a>
+      </div>
+
+      <div id="status" class="small"></div>
+    </div>
+  </div>
+
+  <script src="/firebase-config.js"></script>
+  <script type="module" src="/src/pages/profile.js"></script>
+</body>
+</html>

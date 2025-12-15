@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Truco PY — Inicio</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Truco PY</div>
+      <div class="user-chip" id="userChip" style="display:none;">
+        <img id="userPhoto" alt="" />
+        <div>
+          <div id="userName"></div>
+          <a class="small" href="#" id="btnLogout">Salir</a>
+        </div>
+      </div>
+      <a class="small" href="/login.html" id="loginLink">Entrar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="panel stack">
+      <h1 class="h1">Jugar</h1>
+      <p class="p">MVP. Modo client-only (Firestore) para probar el juego ya.</p>
+
+      <div class="kv">
+        <div>Apodo</div><div id="nickname" class="mono">(sin cargar)</div>
+      </div>
+
+      <div class="row">
+        <a href="/profile.html"><button type="button">Editar apodo</button></a>
+        <a href="/leaderboard.html"><button type="button">Leaderboard</button></a>
+      </div>
+
+      <hr />
+
+      <div class="stack">
+        <div class="stack" style="gap:8px;">
+          <div class="small">Opciones de partida</div>
+          <div class="row" style="align-items:center; gap:10px;">
+            <div class="small" style="min-width:140px;">Modo</div>
+            <select id="matchMode">
+              <option value="hands" selected>Manos (simple)</option>
+              <option value="points">Puntos (Truco PY)</option>
+            </select>
+          </div>
+          <div class="row" style="align-items:center; gap:10px;">
+            <div class="small" style="min-width:140px;">Puntos para ganar</div>
+            <select id="targetPoints">
+              <option value="30" selected>30</option>
+              <option value="40">40</option>
+            </select>
+          </div>
+          <div class="row" style="align-items:center; gap:10px;">
+            <div class="small" style="min-width:140px;">Manos para ganar</div>
+            <select id="matchTargetWins">
+              <option value="2" selected>2 (rápida)</option>
+              <option value="3">3 (media)</option>
+              <option value="5">5 (larga)</option>
+              <option value="10">10 (muy larga)</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btnCreate" class="primary" disabled>Crear partida PvP</button>
+        <div class="row">
+          <input id="joinCode" placeholder="Código" />
+          <button id="btnJoin" disabled>Unirse</button>
+        </div>
+        <button id="btnBot" disabled>Jugar vs Bot</button>
+      </div>
+
+      <div id="status" class="small"></div>
+
+      <hr />
+      <div class="small">Compartí el código con tu oponente o abrí otra pestaña y uníte.</div>
+    </div>
+  </div>
+
+  <script src="/firebase-config.js"></script>
+  <script type="module" src="/src/pages/index.js"></script>
+</body>
+</html>

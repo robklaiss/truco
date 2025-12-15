@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xlink="http://www.w3.org/1999/xlink" width="211" height="322" viewBox="0 0 211 322">
+  <defs xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect xmlns="http://www.w3.org/2000/svg" width="207" height="318" rx="15" ry="15" x="0.5" y="-871.13782" id="card_body" style="fill:url(#linearGradient4973);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"/>
+    <path xmlns="http://www.w3.org/2000/svg" d="m 738.9,-856.63781 35.6,0 0,288.99998 -35.6,0 m -35.6,0 -35.6,0 m -35.6,0 -35.6,0 0,-288.99998 35.6,0 m 35.6,0 35.6,0" id="frame_espadas" style="fill:none;stroke:#000000;stroke-opacity:1"/>
+    <g xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="g3290">
+      <use transform="translate(705.22085,79.99828)" id="use3286" x="0" y="0" width="2485" height="1592" xlink:href="#text7895"/>
+      <use transform="matrix(-1,0,0,-1,3642.7797,-840.27328)" id="use3288" x="0" y="0" width="2485" height="1592" xlink:href="#text7895"/>
+    </g>
+    <linearGradient xmlns="http://www.w3.org/2000/svg" id="linearGradient3293">
+      <stop id="stop3295" style="stop-color:#ffffff;stop-opacity:1" offset="0"/>
+      <stop id="stop3297" style="stop-color:#cccccc;stop-opacity:1" offset="1"/>
+    </linearGradient>
+    <linearGradient xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x1="135.06662" y1="-723.17877" x2="-384.7966" y2="-723.17877" id="linearGradient4973" xlink:href="#linearGradient3293" gradientUnits="userSpaceOnUse"/>
+    <g xmlns="http://www.w3.org/2000/svg" transform="matrix(1.2241307,0,0,1.2241307,-185.62049,110.11532)" id="text7895" style="font-size:19.33501625px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;font-family:FreeSerif;-inkscape-font-specification:FreeSerif">
+      <path d="m 1283.8529,-578.60348 c -0.232,10e-6 -0.6961,0.1418 -1.3921,0.42537 l 0,-0.27069 3.4803,-1.75949 0.1546,0.0387 0,11.60101 c 0,0.46404 0.116,0.76696 0.3481,0.90875 0.232,0.14179 0.7283,0.21913 1.4888,0.23202 l 0,0.29002 -5.3365,0 0,-0.29002 c 0.7218,-0.0258 1.2052,-0.1289 1.4501,-0.30936 0.2578,-0.19335 0.3867,-0.59294 0.3867,-1.19877 l 0,-8.75877 c 0,-0.60582 -0.1933,-0.90873 -0.58,-0.90874" id="path7905" style="font-size:19.33501625px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;font-family:FreeSerif;-inkscape-font-specification:FreeSerif"/>
+      <path d="m 1293.5204,-578.60348 c -0.232,10e-6 -0.6961,0.1418 -1.3921,0.42537 l 0,-0.27069 3.4803,-1.75949 0.1547,0.0387 0,11.60101 c -10e-5,0.46404 0.116,0.76696 0.348,0.90875 0.232,0.14179 0.7283,0.21913 1.4888,0.23202 l 0,0.29002 -5.3365,0 0,-0.29002 c 0.7219,-0.0258 1.2052,-0.1289 1.4501,-0.30936 0.2578,-0.19335 0.3867,-0.59294 0.3867,-1.19877 l 0,-8.75877 c 0,-0.60582 -0.1933,-0.90873 -0.58,-0.90874" id="path7907" style="font-size:19.33501625px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;font-family:FreeSerif;-inkscape-font-specification:FreeSerif"/>
+    </g>
+  </defs>
+  <g xmlns:xlink="http://www.w3.org/1999/xlink" transform="translate(-2078.5 -94.864642)">
+    <g xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" transform="translate(10,0.002432)" id="jack_spade">
+      <use transform="translate(2070,968.00003)" id="use7560" x="0" y="0" width="2496" height="1595" xlink:href="#card_body"/>
+      <use transform="translate(1488.5,968.00003)" id="use7640" x="0" y="0" width="2496" height="1595" xlink:href="#frame_espadas"/>
+      <use transform="translate(0,635.99971)" id="use3298" x="0" y="0" width="2485" height="1592" xlink:href="#g3290"/>
+    </g>
+  </g>
+</svg>

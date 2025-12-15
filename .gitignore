@@ -1,0 +1,25 @@
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# PHP / Composer
+vendor/
+
+# Firebase
+.firebase/
+firestore-debug.log
+firebase-debug.log
+client/public/firebase-config.js
+
+# Misc
+*.log
+
+# Build artifacts
+/dist/
+/build/
+/coverage/
