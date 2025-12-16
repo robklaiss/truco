@@ -2,6 +2,7 @@ import { db } from "../firebase.js";
 import { ensureUserDoc, getUserDoc } from "../user_store.js";
 import { qs, requireAuthOrRedirect, setText, setUserChip } from "../ui.js";
 import { loadCardsMeta } from "../cards.js";
+import { cardIdToPng } from "../lib/cartasAssets.js";
 import { doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const photoEl = qs("#userPhoto");
@@ -9,7 +10,7 @@ const nameEl = qs("#userName");
 const logoutEl = qs("#btnLogout");
 
 const gameIdEl = qs("#gameId");
-const publicStateEl = qs("#publicState");
+const publicStateEl = document.querySelector("#publicState");
 const privateStateEl = qs("#privateState");
 const turnEl = qs("#turn");
 const gameStatusEl = qs("#gameStatus");
@@ -25,6 +26,7 @@ const scoreOtherHandEl = document.querySelector("#scoreOtherHand");
 const historyListEl = document.querySelector("#historyList");
 const btnNextHandEl = document.querySelector("#btnNextHand");
 const tableEl = qs("#table");
+const tableWinnerEl = document.querySelector("#tableWinner");
 const handEl = qs("#hand");
 const handHintEl = qs("#handHint");
 
@@ -55,39 +57,11 @@ function showOverlay(txt) {
   overlayEl.classList.add("visible");
 }
 
-const _cardSvgUrlCache = new Map();
-
-async function getCardImgSrc(cardId) {
-  const key = String(cardId || "");
-  if (!key) throw new Error("Missing cardId");
-  const cached = _cardSvgUrlCache.get(key);
-  if (cached) return cached;
-
-  const res = await fetch(`/cards/${encodeURIComponent(key)}.svg`, { cache: "force-cache" });
-  if (!res.ok) {
-    throw new Error(`Failed to load card SVG ${key}: HTTP ${res.status}`);
-  }
-  let txt = await res.text();
-
-  txt = txt.replace(/(\sxmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink")(\sxmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink")+/g, "$1");
-
-  const blob = new Blob([txt], { type: "image/svg+xml" });
-  const url = URL.createObjectURL(blob);
-  _cardSvgUrlCache.set(key, url);
-  return url;
-}
-
 function setCardImg(imgEl, cardId) {
   imgEl.alt = cardId;
   imgEl.decoding = "async";
   imgEl.loading = "lazy";
-  getCardImgSrc(cardId)
-    .then((src) => {
-      imgEl.src = src;
-    })
-    .catch(() => {
-      imgEl.src = `/cards/${cardId}.svg`;
-    });
+  imgEl.src = cardIdToPng(cardId);
 }
 
 function renderCardStrip(container, items, { clickable = false, onClick } = {}) {
@@ -123,6 +97,96 @@ function renderCardStrip(container, items, { clickable = false, onClick } = {}) 
     }
     container.appendChild(wrap);
   }
+}
+
+let lastTableCardByUid = new Map();
+
+function renderTableSlots(container, game, myUid) {
+  container.innerHTML = "";
+  container.style.display = "flex";
+  container.style.gap = "12px";
+  container.style.overflow = "auto";
+  container.style.padding = "6px 0";
+  container.style.justifyContent = "center";
+
+  const nick = nicknameByUid(game);
+  const other = otherUid(game, myUid);
+
+  let otherLabel = other ? (nick.get(other) || other.slice(0, 6)) : "rival";
+  if (other === "BOT") otherLabel = "Bot";
+
+  const table = Array.isArray(game?.table) ? game.table : [];
+  const byUid = new Map();
+  for (const t of table) {
+    if (t?.uid && t?.cardId) byUid.set(t.uid, t.cardId);
+  }
+
+  const slots = [
+    { uid: myUid, label: nick.get(myUid) || "vos" },
+    { uid: other, label: otherLabel }
+  ];
+
+  const nextTableCardByUid = new Map();
+
+  for (const s of slots) {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = "center";
+    wrap.style.gap = "6px";
+    wrap.style.padding = "8px";
+    wrap.style.background = "rgba(11,16,32,0.35)";
+    wrap.style.border = "1px solid var(--border)";
+    wrap.style.borderRadius = "12px";
+    wrap.style.minWidth = "110px";
+
+    const cid = s.uid ? byUid.get(s.uid) : "";
+    if (s.uid) nextTableCardByUid.set(s.uid, cid || "");
+    if (cid) {
+      const img = document.createElement("img");
+      setCardImg(img, cid);
+      img.style.width = "112px";
+      img.style.height = "auto";
+      img.style.borderRadius = "10px";
+
+      const prevCid = s.uid ? (lastTableCardByUid.get(s.uid) || "") : "";
+      if (s.uid && cid !== prevCid) {
+        try {
+          img.animate([
+            { opacity: 0, transform: "translateY(10px) scale(0.98)" },
+            { opacity: 1, transform: "translateY(0) scale(1)" }
+          ], {
+            duration: 260,
+            easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+            fill: "both"
+          });
+        } catch {
+        }
+      }
+      wrap.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.style.width = "112px";
+      ph.style.height = "156px";
+      ph.style.borderRadius = "10px";
+      ph.style.border = "1px dashed var(--border)";
+      ph.style.display = "flex";
+      ph.style.alignItems = "center";
+      ph.style.justifyContent = "center";
+      ph.style.color = "var(--muted)";
+      ph.textContent = "–";
+      wrap.appendChild(ph);
+    }
+
+    const label = document.createElement("div");
+    label.className = "small mono";
+    label.textContent = s.label;
+    wrap.appendChild(label);
+
+    container.appendChild(wrap);
+  }
+
+  lastTableCardByUid = nextTableCardByUid;
 }
 
 function otherUid(game, uid) {
@@ -579,6 +643,46 @@ async function renderCardsPreview() {
   let botTimer = null;
   let botActInFlight = false;
 
+  const TABLE_HOLD_MS = 5000;
+  let tablePauseUntil = 0;
+  let tableWinnerMsgUntil = 0;
+  let tableWinnerTimer = null;
+  let lastDealKey = "";
+  let lastNonEmptyTable = [];
+  let lastNonEmptyTableAt = 0;
+  let lastNonEmptyTableHandNo = 0;
+  let lastNonEmptyTableTrickNo = 0;
+  let lastCompletedTrickTable = [];
+  let lastCompletedTrickAt = 0;
+  let lastCompletedTrickHandNo = 0;
+  let lastCompletedTrickNo = 0;
+  let tableHoldTimer = null;
+  let pauseRerenderTimer = null;
+
+  function clearPauseRerender() {
+    if (pauseRerenderTimer) {
+      clearTimeout(pauseRerenderTimer);
+      pauseRerenderTimer = null;
+    }
+  }
+
+  function schedulePauseRerender() {
+    clearPauseRerender();
+    const remaining = tablePauseUntil - Date.now();
+    if (remaining <= 0) return;
+    pauseRerenderTimer = setTimeout(() => {
+      pauseRerenderTimer = null;
+      try {
+        renderHandFromCache();
+      } catch {
+      }
+      try {
+        if (lastGame) renderTableSlots(tableEl, lastGame, user.uid);
+      } catch {
+      }
+    }, remaining + 20);
+  }
+
   function isPointsMode(g) {
     return String(g?.matchMode || "hands") === "points";
   }
@@ -899,8 +1003,29 @@ async function renderCardsPreview() {
 
       const handNo = Number(g?.handNo || 1);
       const okHand = Number(g?.botHandNo || 0) === handNo;
-      const hand = okHand && Array.isArray(g?.botHand) ? g.botHand.slice() : [];
-      const idx = hand.indexOf(cardId);
+      let hand = okHand && Array.isArray(g?.botHand) ? g.botHand.slice() : [];
+      if (!hand.length && Array.isArray(g?.deck) && g.deck.length) {
+        const players = Array.isArray(g.players) ? g.players : [];
+        const botIdx = players.findIndex((p) => p?.uid === BOT_UID);
+        if (botIdx >= 0) {
+          hand = botIdx === 0 ? g.deck.slice(0, 3) : g.deck.slice(3, 6);
+        }
+      }
+
+      let pick = String(cardId || "").trim();
+      if (!pick) {
+        const playsNow = (g.trickPlays && typeof g.trickPlays === "object") ? g.trickPlays : {};
+        const otherId = Object.entries(playsNow).find(([uid]) => uid !== BOT_UID)?.[1] || "";
+        const otherPow = otherId ? Number(cardPower.get(otherId) || 0) : null;
+        const sorted = hand.slice().sort((a, b) => (Number(cardPower.get(a) || 0) - Number(cardPower.get(b) || 0)));
+        pick = sorted[0] || "";
+        if (otherPow != null) {
+          const winning = sorted.find((cid) => Number(cardPower.get(cid) || 0) > otherPow);
+          pick = winning || sorted[0] || "";
+        }
+      }
+
+      const idx = hand.indexOf(pick);
       if (idx === -1) throw new Error("Carta inválida del bot.");
 
       const trickNo = Number(g.trickNo || 1);
@@ -910,8 +1035,8 @@ async function renderCardsPreview() {
       hand.splice(idx, 1);
 
       const table = Array.isArray(g.table) ? g.table.slice() : [];
-      table.push({ uid: BOT_UID, cardId, trickNo });
-      plays[BOT_UID] = cardId;
+      table.push({ uid: BOT_UID, cardId: pick, trickNo });
+      plays[BOT_UID] = pick;
 
       const nextUid = otherUid(g, BOT_UID);
       let nextTurnUid = nextUid || BOT_UID;
@@ -984,21 +1109,33 @@ async function renderCardsPreview() {
 
   function scheduleBotAct() {
     if (botTimer) return;
+    let delay = 650;
+    const g = lastGame;
+    const blocked = !!g?.callPending || (g?.envido && g.envido.state === "waiting_declare");
+    if (!blocked) {
+      const remaining = tablePauseUntil - Date.now();
+      if (remaining > 0) delay = Math.max(delay, remaining);
+    }
     botTimer = setTimeout(() => {
       botTimer = null;
       void maybeBotAct();
-    }, 650);
+    }, delay);
   }
 
   async function maybeBotAct() {
     if (botActInFlight) return;
     botActInFlight = true;
+    let acted = false;
     try {
       const g = lastGame;
       if (!g) return;
       if (!isBotGame(g)) return;
       if (g.matchWinnerUid) return;
       if (g.status !== "playing") return;
+
+      const paused = Date.now() < tablePauseUntil;
+      const blocked = !!g.callPending || (g.envido && g.envido.state === "waiting_declare");
+      if (paused && g.turnUid === BOT_UID && !blocked) return;
 
       await ensureBotHandForHand(g);
 
@@ -1014,14 +1151,17 @@ async function renderCardsPreview() {
         if (cp.kind === "envido") {
           if (envidoScore >= 32 && cp.offer !== "falta_envido") {
             await botCounterEnvido("falta_envido");
+            acted = true;
             return;
           }
           if (envidoScore >= 29 && cp.offer === "envido") {
             await botCounterEnvido("real_envido");
+            acted = true;
             return;
           }
           const accept = envidoScore >= 25;
           await botRespondToCall(accept);
+          acted = true;
           return;
         }
 
@@ -1029,14 +1169,17 @@ async function renderCardsPreview() {
           const offered = Number(cp.offeredValue || 1);
           if (offered === 2 && maxPow >= 11) {
             await botCounterTruco("retruco");
+            acted = true;
             return;
           }
           if (offered === 3 && maxPow >= 13) {
             await botCounterTruco("vale4");
+            acted = true;
             return;
           }
           const accept = offered === 2 ? (maxPow >= 8) : (offered === 3 ? (maxPow >= 10) : (maxPow >= 12));
           await botRespondToCall(accept);
+          acted = true;
           return;
         }
       }
@@ -1045,14 +1188,17 @@ async function renderCardsPreview() {
         if (!g.firstCardPlayed && (!g.envido || g.envido.state === "none")) {
           if (envidoScore >= 32 && Math.random() < 0.25) {
             await botStartEnvido("falta_envido");
+            acted = true;
             return;
           }
           if (envidoScore >= 30 && Math.random() < 0.35) {
             await botStartEnvido("real_envido");
+            acted = true;
             return;
           }
           if (envidoScore >= 27 && Math.random() < 0.55) {
             await botStartEnvido("envido");
+            acted = true;
             return;
           }
         }
@@ -1061,14 +1207,17 @@ async function renderCardsPreview() {
         const canRaiseTruco = g.trucoLastRaiseUid !== BOT_UID;
         if (currentTrucoValue === 1 && maxPow >= 9 && Math.random() < 0.35) {
           await botStartTruco("truco");
+          acted = true;
           return;
         }
         if (currentTrucoValue === 2 && canRaiseTruco && maxPow >= 11 && Math.random() < 0.25) {
           await botStartTruco("retruco");
+          acted = true;
           return;
         }
         if (currentTrucoValue === 3 && canRaiseTruco && maxPow >= 13 && Math.random() < 0.18) {
           await botStartTruco("vale4");
+          acted = true;
           return;
         }
 
@@ -1083,11 +1232,19 @@ async function renderCardsPreview() {
             pick = winning || sorted[0];
           }
           await botPlayCard(pick);
+          acted = true;
         }
       }
-    } catch {
+    } catch (e) {
+      console.warn("bot act failed", e);
     } finally {
       botActInFlight = false;
+
+      const g = lastGame;
+      if (!acted && g && isBotGame(g) && g.status === "playing" && !g.matchWinnerUid) {
+        const blocked = !!g.callPending || (g.envido && g.envido.state === "waiting_declare");
+        if (!blocked && g.turnUid === BOT_UID) scheduleBotAct();
+      }
     }
   }
 
@@ -1534,6 +1691,110 @@ async function renderCardsPreview() {
     }
   }
 
+  function animateDealToHand(cardIds) {
+    try {
+      const ids = Array.isArray(cardIds) ? cardIds.filter(Boolean) : [];
+      if (ids.length !== 3) return;
+      if (!handEl || !tableEl) return;
+      if (document.visibilityState && document.visibilityState !== "visible") return;
+
+      const targetImgs = Array.from(handEl.querySelectorAll("button img"));
+      if (targetImgs.length < 3) return;
+
+      const tRect = tableEl.getBoundingClientRect();
+      const sx = tRect.left + tRect.width / 2;
+      const sy = tRect.top + Math.min(tRect.height / 2, 80);
+
+      const overlay = document.createElement("div");
+      overlay.style.position = "fixed";
+      overlay.style.left = "0";
+      overlay.style.top = "0";
+      overlay.style.width = "100vw";
+      overlay.style.height = "100vh";
+      overlay.style.pointerEvents = "none";
+      overlay.style.zIndex = "9999";
+      document.body.appendChild(overlay);
+
+      const prevHandPointer = handEl.style.pointerEvents;
+      handEl.style.pointerEvents = "none";
+
+      let done = 0;
+      const finishAll = () => {
+        try {
+          if (overlay && overlay.isConnected) overlay.remove();
+        } catch {
+        }
+        try {
+          handEl.style.pointerEvents = prevHandPointer;
+        } catch {
+        }
+      };
+
+      const safety = setTimeout(() => {
+        for (const img of targetImgs) {
+          try { img.style.opacity = "1"; } catch {
+          }
+        }
+        finishAll();
+      }, 1800);
+
+      for (let i = 0; i < 3; i++) {
+        const imgEl = targetImgs[i];
+        const rect = imgEl.getBoundingClientRect();
+        const tw = rect.width || 86;
+        const th = rect.height || Math.round(tw * 1.39);
+        const tx = rect.left + rect.width / 2;
+        const ty = rect.top + rect.height / 2;
+
+        imgEl.style.opacity = "0";
+
+        const ghost = document.createElement("img");
+        setCardImg(ghost, ids[i]);
+        ghost.style.position = "absolute";
+        ghost.style.width = `${tw}px`;
+        ghost.style.height = `${th}px`;
+        ghost.style.left = `${sx - tw / 2}px`;
+        ghost.style.top = `${sy - th / 2}px`;
+        ghost.style.borderRadius = "10px";
+        ghost.style.boxShadow = "0 14px 36px rgba(0,0,0,0.35)";
+        overlay.appendChild(ghost);
+
+        const dx = tx - sx;
+        const dy = ty - sy;
+
+        const anim = ghost.animate([
+          { transform: "translate(0px, 0px) scale(0.85)", opacity: 0 },
+          { transform: `translate(${dx * 0.85}px, ${dy * 0.85}px) scale(1.03)`, opacity: 1, offset: 0.75 },
+          { transform: `translate(${dx}px, ${dy}px) scale(1)`, opacity: 1 }
+        ], {
+          duration: 520,
+          delay: i * 90,
+          easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+          fill: "forwards"
+        });
+
+        anim.finished.then(() => {
+          try { ghost.remove(); } catch {
+          }
+          try { imgEl.style.opacity = "1"; } catch {
+          }
+          done += 1;
+          if (done >= 3) {
+            clearTimeout(safety);
+            finishAll();
+          }
+        }).catch(() => {
+          done += 1;
+          if (done >= 3) {
+            clearTimeout(safety);
+            finishAll();
+          }
+        });
+      }
+    } catch {
+    }
+  }
+
   function renderHandFromCache() {
     const currentHandNo = Number(lastGame?.handNo || 1);
     const myHandNo = Number(lastPriv?.handNo || 0);
@@ -1541,12 +1802,19 @@ async function renderCardsPreview() {
     const hand = ok && Array.isArray(lastPriv?.hand) ? lastPriv.hand : [];
     const playing = lastGame?.status === "playing";
     const blocked = !!lastGame?.callPending || (lastGame?.envido && lastGame.envido.state === "waiting_declare");
-    const myTurn = playing && lastGame?.turnUid === user.uid && !blocked;
+    const paused = Date.now() < tablePauseUntil;
+    const myTurn = playing && lastGame?.turnUid === user.uid && !blocked && !paused;
 
     renderCardStrip(handEl, hand.map((cid) => ({ cardId: cid })), {
       clickable: myTurn,
       onClick: onHandCardClick
     });
+
+    const dealKey = (ok && hand.length === 3) ? `${currentHandNo}:${hand.join("|")}` : "";
+    if (dealKey && dealKey !== lastDealKey) {
+      lastDealKey = dealKey;
+      queueMicrotask(() => animateDealToHand(hand));
+    }
 
     if (!hand.length) {
       handHintEl.style.color = "var(--muted)";
@@ -1556,7 +1824,8 @@ async function renderCardsPreview() {
 
     if (playing && !myTurn) {
       handHintEl.style.color = "var(--muted)";
-      setText(handHintEl, blocked ? "Resolviendo canto…" : "No es tu turno.");
+      if (!blocked && lastGame?.turnUid === user.uid && paused) setText(handHintEl, "Esperando…");
+      else setText(handHintEl, blocked ? "Resolviendo canto…" : (lastGame?.turnUid === BOT_UID ? "Turno del bot…" : "No es tu turno."));
       return;
     }
 
@@ -1565,14 +1834,14 @@ async function renderCardsPreview() {
 
   const unsubPub = onSnapshot(pubRef, async (snap) => {
     if (!snap.exists()) {
-      setText(publicStateEl, "(no existe)\n\nEn el MVP, este doc lo crea el backend (Paso 5).\n");
+      if (publicStateEl) setText(publicStateEl, "(no existe)\n\nEn el MVP, este doc lo crea el backend (Paso 5).\n");
       setText(turnEl, "waiting");
       setText(gameStatusEl, "No existe la partida. Volvé al inicio y creala.");
       return;
     }
     const data = snap.data();
     lastGame = data;
-    setText(publicStateEl, JSON.stringify(data, null, 2));
+    if (publicStateEl) setText(publicStateEl, JSON.stringify(data, null, 2));
 
     maybeApplyLeaderboard(data);
     updateCantosUI(data);
@@ -1636,10 +1905,153 @@ async function renderCardsPreview() {
       setText(gameStatusEl, "");
     }
 
-    const table = Array.isArray(data.table) ? data.table : [];
-    renderCardStrip(tableEl, table.map((t) => ({ cardId: t.cardId, label: t.uid === user.uid ? "vos" : "rival" })), { clickable: false });
+    const currentHandNo2 = Number(data.handNo || 1);
+    const currentTrickNo2 = Number(data.trickNo || 1);
 
-    setText(turnEl, data.turnUid ? (data.turnUid === user.uid ? "Tu turno" : "Esperando jugada…") : (data.status || ""));
+    if (lastNonEmptyTableHandNo && currentHandNo2 !== lastNonEmptyTableHandNo) {
+      lastNonEmptyTable = [];
+      lastNonEmptyTableAt = 0;
+      lastNonEmptyTableHandNo = 0;
+      lastNonEmptyTableTrickNo = 0;
+      lastCompletedTrickTable = [];
+      lastCompletedTrickAt = 0;
+      lastCompletedTrickHandNo = 0;
+      lastCompletedTrickNo = 0;
+      tablePauseUntil = 0;
+      clearPauseRerender();
+      tableWinnerMsgUntil = 0;
+      if (tableWinnerTimer) {
+        clearTimeout(tableWinnerTimer);
+        tableWinnerTimer = null;
+      }
+      if (tableHoldTimer) {
+        clearTimeout(tableHoldTimer);
+        tableHoldTimer = null;
+      }
+    }
+
+    const rawTable = Array.isArray(data.table) ? data.table : [];
+    if (rawTable.length) {
+      lastNonEmptyTable = rawTable.slice();
+      lastNonEmptyTableAt = Date.now();
+      lastNonEmptyTableHandNo = currentHandNo2;
+      lastNonEmptyTableTrickNo = currentTrickNo2;
+      if (tableHoldTimer) {
+        clearTimeout(tableHoldTimer);
+        tableHoldTimer = null;
+      }
+    }
+
+    if (!rawTable.length) {
+      const hist = Array.isArray(data.trickHistory) ? data.trickHistory : [];
+      const last = hist.length ? hist[hist.length - 1] : null;
+      const histTrickNo = Number(last?.trickNo || 0);
+      const plays = (last?.plays && typeof last.plays === "object") ? last.plays : {};
+      const entries = Object.entries(plays).filter(([, cid]) => !!cid);
+      if (histTrickNo && (histTrickNo === currentTrickNo2 - 1 || histTrickNo === currentTrickNo2) && entries.length) {
+        if (lastCompletedTrickHandNo !== currentHandNo2 || lastCompletedTrickNo !== histTrickNo) {
+          lastCompletedTrickTable = entries.map(([uid, cardId]) => ({ uid, cardId, trickNo: histTrickNo }));
+          lastCompletedTrickAt = Date.now();
+          lastCompletedTrickHandNo = currentHandNo2;
+          lastCompletedTrickNo = histTrickNo;
+          tablePauseUntil = Math.max(tablePauseUntil, lastCompletedTrickAt + TABLE_HOLD_MS);
+          schedulePauseRerender();
+
+          if (tableWinnerEl) {
+            const nick = nicknameByUid(data);
+            const wuid = String(last?.winnerUid || "");
+            let wname = wuid ? (nick.get(wuid) || wuid.slice(0, 6)) : "";
+            if (wuid === BOT_UID) wname = "Bot";
+            setText(tableWinnerEl, wname ? `Ganó la baza: ${wname}` : "");
+            tableWinnerEl.style.color = "var(--muted)";
+            tableWinnerMsgUntil = lastCompletedTrickAt + TABLE_HOLD_MS;
+            if (tableWinnerTimer) clearTimeout(tableWinnerTimer);
+            tableWinnerTimer = setTimeout(() => {
+              tableWinnerTimer = null;
+              if (Date.now() >= tableWinnerMsgUntil && tableWinnerEl) setText(tableWinnerEl, "");
+            }, TABLE_HOLD_MS);
+          }
+        }
+      }
+    }
+
+    if (tableWinnerEl) {
+      if (data.matchWinnerUid) {
+        const nick = nicknameByUid(data);
+        const wuid = String(data.matchWinnerUid || "");
+        let wname = wuid ? (nick.get(wuid) || wuid.slice(0, 6)) : "";
+        if (wuid === BOT_UID) wname = "Bot";
+        setText(tableWinnerEl, wname ? `Ganó la partida: ${wname}` : "");
+        tableWinnerEl.style.color = "var(--ok)";
+      } else if (data.status === "finished" && data.finishedWinnerUid) {
+        const nick = nicknameByUid(data);
+        const wuid = String(data.finishedWinnerUid || "");
+        let wname = wuid ? (nick.get(wuid) || wuid.slice(0, 6)) : "";
+        if (wuid === BOT_UID) wname = "Bot";
+        setText(tableWinnerEl, wname ? `Ganó la mano: ${wname}` : "");
+        tableWinnerEl.style.color = "var(--ok)";
+      } else if (Date.now() >= tableWinnerMsgUntil) {
+        setText(tableWinnerEl, "");
+      }
+    }
+
+    let tableToRender = rawTable;
+    if (!rawTable.length) {
+      const now = Date.now();
+      const canHoldHistory = lastCompletedTrickTable.length
+        && currentHandNo2 === lastCompletedTrickHandNo
+        && (currentTrickNo2 === lastCompletedTrickNo + 1 || currentTrickNo2 === lastCompletedTrickNo);
+      const ageHist = canHoldHistory ? (now - lastCompletedTrickAt) : Number.POSITIVE_INFINITY;
+
+      if (canHoldHistory && ageHist < TABLE_HOLD_MS) {
+        tableToRender = lastCompletedTrickTable;
+        const remaining = TABLE_HOLD_MS - ageHist;
+        if (tableHoldTimer) clearTimeout(tableHoldTimer);
+        tableHoldTimer = setTimeout(() => {
+          tableHoldTimer = null;
+          try {
+            renderTableSlots(tableEl, lastGame, user.uid);
+          } catch (e) {
+            console.warn("renderTableSlots failed", e);
+          }
+        }, remaining);
+      } else if (lastNonEmptyTable.length) {
+        const age = now - lastNonEmptyTableAt;
+        const holdable = currentHandNo2 === lastNonEmptyTableHandNo && (currentTrickNo2 === lastNonEmptyTableTrickNo + 1 || currentTrickNo2 === lastNonEmptyTableTrickNo);
+        if (holdable && age < TABLE_HOLD_MS) {
+          tableToRender = lastNonEmptyTable;
+          const remaining = TABLE_HOLD_MS - age;
+          if (tableHoldTimer) clearTimeout(tableHoldTimer);
+          tableHoldTimer = setTimeout(() => {
+            tableHoldTimer = null;
+            try {
+              renderTableSlots(tableEl, lastGame, user.uid);
+            } catch (e) {
+              console.warn("renderTableSlots failed", e);
+            }
+          }, remaining);
+        }
+      }
+    }
+
+    try {
+      renderTableSlots(tableEl, { ...data, table: tableToRender }, user.uid);
+    } catch (e) {
+      console.warn("renderTableSlots failed", e);
+    }
+
+    const nick = nicknameByUid(data);
+    const tuid = String(data.turnUid || "");
+    const base = data.status || "";
+    const isPlaying = data.status === "playing" && !data.matchWinnerUid;
+    let turnTxt = base;
+    if (isPlaying) {
+      if (tuid === user.uid) turnTxt = "Tu turno";
+      else if (tuid === BOT_UID) turnTxt = "Turno del bot";
+      else if (tuid) turnTxt = `Turno de ${nick.get(tuid) || "rival"}`;
+      else turnTxt = "";
+    }
+    setText(turnEl, turnTxt);
     renderNarrative({ game: data, myUid: user.uid });
     renderHandFromCache();
     hideOverlay();
